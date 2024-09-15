@@ -1,7 +1,9 @@
 package com.javaproject.authanticator.controllers;
 
+import com.javaproject.authanticator.dto.ResponseDTO;
 import com.javaproject.authanticator.model.User;
 import com.javaproject.authanticator.repository.UserRepository;
+import com.javaproject.authanticator.security.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ public class UserController {
     private UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
+    private final TokenService tokenService;
 
     @GetMapping
     public ResponseEntity<String> getUser(){
@@ -26,7 +29,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> editUser(@PathVariable String id, @RequestBody User updatedUser) {
+    public ResponseEntity<ResponseDTO> editUser(@PathVariable String id, @RequestBody User updatedUser) {
         Optional<User> userOptional = userRepository.findById(id);
 
         if (userOptional.isPresent()) {
@@ -40,8 +43,9 @@ public class UserController {
             }
 
             userRepository.save(existingUser);
-            return ResponseEntity.ok(existingUser);
 
+            String token = tokenService.generateToken(existingUser);
+            return ResponseEntity.ok(new ResponseDTO(existingUser.getName(), token));
         } else {
             return ResponseEntity.notFound().build();
         }
