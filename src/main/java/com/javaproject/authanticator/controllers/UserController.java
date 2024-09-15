@@ -2,17 +2,23 @@ package com.javaproject.authanticator.controllers;
 
 import com.javaproject.authanticator.model.User;
 import com.javaproject.authanticator.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/user")
 public class UserController {
     @Autowired
     private UserRepository userRepository;
+
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping
     public ResponseEntity<String> getUser(){
@@ -27,7 +33,11 @@ public class UserController {
             User existingUser = userOptional.get();
             existingUser.setName(updatedUser.getName());
             existingUser.setEmail(updatedUser.getEmail());
-            existingUser.setPassword(updatedUser.getPassword());
+
+            if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+                String encodedPassword = passwordEncoder.encode(updatedUser.getPassword());
+                existingUser.setPassword(encodedPassword);
+            }
 
             userRepository.save(existingUser);
             return ResponseEntity.ok(existingUser);
