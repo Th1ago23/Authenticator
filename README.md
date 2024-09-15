@@ -1,4 +1,4 @@
-# Authanticator
+# Authenticator
 
 Authanticator é um serviço de autenticação baseado em Spring Security com JWT (JSON Web Token). Este projeto permite a criação de usuários e a autenticação com base em tokens JWT, proporcionando segurança para rotas protegidas.
 
